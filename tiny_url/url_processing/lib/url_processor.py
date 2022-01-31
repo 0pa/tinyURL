@@ -1,6 +1,6 @@
-from datetime import datetime
 import json
 
+from django.utils import timezone
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist, FieldError, FieldDoesNotExist, RequestAborted
 
@@ -21,11 +21,10 @@ class UrlProcessor:
         Returns:
             Original_url
         """
-        print(tiny_url)
         try:
             u = Url.objects.get(pk=tiny_url)
             u.counter += 1
-            u.last_request_date = datetime.now()
+            u.last_request_date = timezone.now()
             u.save()
             return u.original_url
         except Exception as e:
@@ -61,9 +60,8 @@ class UrlProcessor:
             Returns tiny_url
         """
         try:
-            req_dict = json.loads(request.body)
-            orig_url = req_dict['url']
-            tiny_url = req_dict.get('shortcode', None)
+            orig_url = request.POST['url']
+            tiny_url = request.POST.get('shortcode', None)
 
             if not tiny_url:
                 counter = 0
@@ -77,8 +75,8 @@ class UrlProcessor:
                                 tiny_url=tiny_url,
                                 original_url=orig_url,
                                 counter=0,
-                                created_date=datetime.now(),
-                                last_request_date=datetime.now()
+                                created_date=timezone.now(),
+                                last_request_date=timezone.now()
                             )
                         u.save()
                         return json.dumps({'shortcode': tiny_url})
@@ -94,8 +92,8 @@ class UrlProcessor:
                             tiny_url=tiny_url,
                             original_url=orig_url,
                             counter=0,
-                            created_date=datetime.now(),
-                            last_request_date=datetime.now()
+                            created_date=timezone.now(),
+                            last_request_date=timezone.now()
                         )
                     u.save()
                     return json.dumps({'shortcode': tiny_url})
