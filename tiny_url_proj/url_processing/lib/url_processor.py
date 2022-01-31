@@ -60,8 +60,9 @@ class UrlProcessor:
             Returns tiny_url
         """
         try:
-            orig_url = request.POST['url']
-            tiny_url = request.POST.get('shortcode', None)
+            req = json.loads(request.body.decode('utf-8'))
+            orig_url = req['url']
+            tiny_url = req.get('shortcode', None)
 
             if not tiny_url:
                 counter = 0

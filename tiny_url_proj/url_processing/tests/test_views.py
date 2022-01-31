@@ -42,10 +42,11 @@ class MyTests(TestCase):
 
     def test_add_new_url(self):
         response = self.client.post('/shorten/',
-                                    {
+                                    """{
                                         "url": "https://www.example.com/",
                                         "shortcode": "abn123"
-                                    }
+                                    }""",
+                                    content_type="application/json"
                                     )
         self.assertEqual(response.status_code, 201)
         resp_content = json.loads(response.content)
