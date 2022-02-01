@@ -46,6 +46,70 @@ Stop and remove containers, networks:
 $ docker-compose down
 ```
 
+## API description
+
+### Add *tiny_url* into database
+POST request to **/shorten** with a body in format:
+```
+{
+    "url": "https://www.example.com/",
+    "shortcode": "abn123"
+}
+```
+This will create a record in the database. 
+When no shortcode provided a random shortcode for the provided url. 
+The shortcode has a length of 6 characters and will contain only
+alphanumeric characters or underscores.
+In case of successful POST reqeust you will receive response with status 201 and the following body:
+```
+{
+    "shortcode": "abn123"
+}
+```
+
+Otherwise, you will get one of the next errors:
+
+| Error |               Info                |
+|-------|:---------------------------------:|
+| 400   |          Url not present          |
+| 409   |     Shortcode already in use      |
+| 412   | The provided shortcode is invalid |
+
+### Get *tiny_url* by *original_url*
+
+GET request to **/<tyni_url>**.
+
+Returns http status 302 with the Location header containing the original url.
+
+| Error |        Info         |
+|-------|:-------------------:|
+| 404   | Shortcode not found |
+
+### Get stats by *tiny_url*
+
+GET request to **/<tyni_url>/stats**.
+
+Returns http status 200 with the following body:
+
+```
+{
+    "created": "2017-05-10T20:45:00.000Z",
+    "lastRedirect": "2018-05-16T10:16:24.666Z",
+    "redirectCount": 6
+}
+```
+
+*created* contains the creation datetime of the shortcode (in ISO8601)
+
+*lastRedirect* contains the datetime of the last usage of the shortcode (in ISO8601)
+
+*redirectCount* indicates the number of times the shortcode has been used
+
+| Error |        Info         |
+|-------|:-------------------:|
+| 404   | Shortcode not found |
+
+
 #### TBD
 
 1. Add cashing (Redis)
